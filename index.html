@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>旅のしおり CM</title>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;800&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --navy: #1a2744; --deep: #0d1a35; --gold: #c9a96e;
+    --cream: #f8f4ec; --accent: #7a9cbf; --green: #3d8b6e;
+  }
+  html, body { width:100%; height:100%; background:#050d1f; font-family:'Noto Sans JP',sans-serif; overflow:hidden; color:white; }
+
+  /* STAR CANVAS — full-page, always visible */
+  #star-canvas {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none;
+  }
+
+  #stage { position:relative; width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; }
+
+  .scene {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity 1s ease;
+    z-index: 1;
+  }
+  .scene.active { opacity:1; pointer-events:auto; }
+
+  /* ── SCENE 0: TITLE ── */
+  #s0 { background: transparent; }
+  .s0-bg {
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse at 50% 55%, rgba(201,169,110,.13) 0%, transparent 65%);
+    z-index:0;
+  }
+  .s0-content { position:relative; z-index:1; text-align:center; }
+  .s0-date {
+    font-size:clamp(10px,2vw,13px); letter-spacing:7px; color:var(--accent);
+    margin-bottom:20px; opacity:0; transform:translateY(10px);
+    transition:all .8s ease .4s;
+  }
+  .s0-title {
+    font-family:'Shippori Mincho',serif;
+    font-size:clamp(40px,10vw,96px);
+    color:var(--cream); line-height:1.1; letter-spacing:.06em;
+    opacity:0; transform:translateY(20px);
+    transition:all 1s ease .7s;
+  }
+  .s0-title em { color:var(--gold); font-style:normal; }
+  .s0-line { width:0; height:1px; background:var(--gold); margin:28px auto; transition:width 1.1s ease 1.4s; }
+  .s0-sub {
+    font-size:clamp(11px,2vw,14px); letter-spacing:5px; color:rgba(255,255,255,.35);
+    opacity:0; transform:translateY(8px); transition:all .8s ease 1.1s;
+  }
+  #s0.active .s0-date,
+  #s0.active .s0-title,
+  #s0.active .s0-sub { opacity:1; transform:translateY(0); }
+  #s0.active .s0-line { width:90px; }
+
+
+
+  /* ── SCENE 1: YOKOHAMA ── */
+  #s1 { background: linear-gradient(180deg, #050d1f 0%, #0d1a35 55%, #091120 100%); }
+  .s1-copy {
+    position:absolute; top:10%; text-align:center;
+    opacity:0; transform:translateY(-12px);
+    transition:all .9s ease .8s; z-index:2;
+  }
+  #s1.active .s1-copy { opacity:1; transform:translateY(0); }
+  .s1-eyebrow { font-size:clamp(9px,1.8vw,11px); letter-spacing:6px; color:var(--gold); margin-bottom:10px; }
+  .s1-headline { font-family:'Shippori Mincho',serif; font-size:clamp(22px,5vw,52px); color:var(--cream); line-height:1.35; }
+
+  .skyline {
+    position:absolute; bottom:30%;
+    left:50%; transform:translateX(-50%) translateY(20px);
+    width:min(720px,96vw);
+    opacity:0; transition:opacity 1.1s ease .5s, transform 1.1s ease .5s; z-index:2;
+  }
+  #s1.active .skyline { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .sea { position:absolute; bottom:0; left:0; right:0; height:32%; z-index:1; }
+  .wave {
+    position:absolute; left:-5%; right:-5%; border-radius:50% 50% 0 0;
+    opacity:.12; animation:waveMove var(--ws,8s) ease-in-out infinite alternate;
+  }
+  .wave:nth-child(1){ bottom:0; height:110px; background:#7a9cbf; --ws:7s; }
+  .wave:nth-child(2){ bottom:18px; height:80px; background:#5a7da0; --ws:9.5s; animation-delay:-3s; }
+  .wave:nth-child(3){ bottom:36px; height:55px; background:var(--accent); --ws:12s; animation-delay:-6s; }
+  @keyframes waveMove { from{ transform:translateX(-2%); } to{ transform:translateX(2%); } }
+
+  /* ── SCENE 2: PHONES ── */
+  #s2 { background:radial-gradient(ellipse at 50% 75%, #1a2744 0%, #050d1f 70%); }
+  .s2-copy {
+    text-align:center; margin-bottom:36px;
+    opacity:0; transform:translateY(-14px); transition:all .8s ease .3s;
+  }
+  #s2.active .s2-copy { opacity:1; transform:translateY(0); }
+  .s2-eyebrow { font-size:11px; letter-spacing:5px; color:var(--gold); margin-bottom:10px; }
+  .s2-headline { font-family:'Shippori Mincho',serif; font-size:clamp(20px,4.5vw,44px); color:var(--cream); line-height:1.45; }
+  .s2-headline em { color:var(--gold); font-style:normal; }
+
+  .phones-wrap {
+    display:flex; gap:22px; align-items:flex-start;
+    opacity:0; transform:translateY(28px); transition:all 1s ease .65s;
+  }
+  #s2.active .phones-wrap { opacity:1; transform:translateY(0); }
+
+  .phone {
+    background:#fff; border-radius:28px;
+    width:clamp(130px,21vw,200px); aspect-ratio:9/19;
+    overflow:hidden;
+    box-shadow:0 24px 64px rgba(0,0,0,.55), 0 0 0 2px rgba(201,169,110,.25);
+    position:relative; flex-shrink:0;
+  }
+  .phone::before {
+    content:''; position:absolute; top:12px; left:50%;
+    transform:translateX(-50%);
+    width:38%; height:5px; background:#222; border-radius:10px; z-index:10;
+  }
+  .phone-inner { position:absolute; inset:0; background:#f8f4ec; padding-top:26px; overflow:hidden; }
+  .ph-header { background:#0d1a35; padding:7px 10px 5px; text-align:center; }
+  .ph-header-label { font-size:5px; letter-spacing:3px; color:#c9a96e; }
+  .ph-header-title { font-family:'Shippori Mincho',serif; font-size:10px; color:#f8f4ec; }
+  .ph-header-sub { font-size:4px; letter-spacing:2px; color:#7a9cbf; margin-top:1px; }
+  .ph-tabs { background:#1a2744; display:flex; }
+  .ph-tab { flex:1; font-size:4px; letter-spacing:.5px; color:rgba(255,255,255,.3); text-align:center; padding:4px 0; }
+  .ph-tab.active { color:#c9a96e; border-bottom:1px solid #c9a96e; }
+  .ph-body { padding:5px; }
+  .ph-day-banner { background:#1a2744; border-radius:3px; padding:5px 7px; margin-bottom:4px; display:flex; align-items:center; gap:5px; }
+  .ph-day-num { font-family:'Shippori Mincho',serif; font-size:13px; color:#c9a96e; }
+  .ph-day-info { flex:1; }
+  .ph-day-date { font-size:3.5px; letter-spacing:2px; color:#7a9cbf; }
+  .ph-day-theme { font-family:'Shippori Mincho',serif; font-size:5px; color:#f8f4ec; }
+  .ph-item { background:white; border-left:2px solid #c9a96e; border-radius:3px; margin-bottom:3px; padding:4px 5px 3px; }
+  .ph-item.transit { border-left-color:#7a9cbf; }
+  .ph-item.hl { border-left-color:#b5474a; }
+  .ph-item-time { font-size:4px; color:#c9a96e; letter-spacing:.5px; }
+  .ph-item-title { font-family:'Shippori Mincho',serif; font-size:6px; color:#1a2744; line-height:1.3; }
+  .ph-item-desc { font-size:3.5px; color:#888; line-height:1.6; margin-top:1px; }
+  .ph-item-btns { display:flex; gap:2px; margin-top:3px; }
+  .ph-btn { font-size:3px; padding:2px 4px; border-radius:10px; border:.5px solid #ddd; color:#555; }
+  .ph-btn.g { background:#e8f4e8; color:#2d6b54; border-color:#c5e0c5; }
+  .ph-btn.b { background:#e8edf8; color:#3a5a9b; border-color:#c0ceea; }
+  .ph-scroll { animation:phoneScroll 7s ease-in-out infinite alternate; }
+  @keyframes phoneScroll { from{transform:translateY(0);} to{transform:translateY(-65px);} }
+
+  /* ── SCENE 3: FEATURES ── */
+  #s3 { background:#050d1f; }
+  .s3-wrap { text-align:center; max-width:min(600px,90vw); }
+  .s3-eyebrow { font-size:10px; letter-spacing:6px; color:var(--gold); margin-bottom:12px; opacity:0; transition:all .7s ease .2s; }
+  #s3.active .s3-eyebrow { opacity:1; }
+  .s3-headline { font-family:'Shippori Mincho',serif; font-size:clamp(20px,4vw,36px); color:var(--cream); opacity:0; transform:translateY(16px); transition:all .8s ease .4s; }
+  #s3.active .s3-headline { opacity:1; transform:translateY(0); }
+  .s3-headline em { color:var(--gold); font-style:normal; }
+  .features-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:26px; }
+  .feat {
+    background:rgba(255,255,255,.04); border:1px solid rgba(201,169,110,.14);
+    border-radius:12px; padding:18px 14px;
+    opacity:0; transform:translateY(20px); transition:all .7s ease;
+  }
+  #s3.active .feat:nth-child(1){ opacity:1; transform:none; transition-delay:.35s; }
+  #s3.active .feat:nth-child(2){ opacity:1; transform:none; transition-delay:.55s; }
+  #s3.active .feat:nth-child(3){ opacity:1; transform:none; transition-delay:.75s; }
+  #s3.active .feat:nth-child(4){ opacity:1; transform:none; transition-delay:.95s; }
+  .feat-icon { font-size:26px; margin-bottom:8px; }
+  .feat-title { font-family:'Shippori Mincho',serif; font-size:clamp(12px,2.4vw,15px); color:var(--cream); margin-bottom:5px; }
+  .feat-desc { font-size:clamp(10px,1.7vw,11px); color:rgba(255,255,255,.4); line-height:1.75; }
+
+  /* ── SCENE 4: ENDING ── */
+  #s4 { background:transparent; }
+  .s4-bg { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 50%, rgba(201,169,110,.11) 0%, transparent 65%); z-index:0; }
+  .s4-content { position:relative; z-index:1; text-align:center; }
+  .s4-tagline {
+    font-family:'Shippori Mincho',serif;
+    font-size:clamp(28px,6.5vw,72px);
+    color:var(--cream); line-height:1.4; letter-spacing:.04em;
+    opacity:0; transform:translateY(22px); transition:all 1.1s ease .3s;
+  }
+  .s4-tagline em { color:var(--gold); font-style:normal; }
+  #s4.active .s4-tagline { opacity:1; transform:translateY(0); }
+  .s4-sub { margin-top:20px; font-size:clamp(11px,1.9vw,14px); letter-spacing:3px; color:rgba(255,255,255,.38); opacity:0; transition:all .8s ease 1s; }
+  #s4.active .s4-sub { opacity:1; }
+  .s4-line { display:block; width:0; height:1px; background:var(--gold); margin:26px auto; transition:width 1s ease 1.6s; }
+  #s4.active .s4-line { width:70px; }
+  .s4-logo { margin-top:4px; opacity:0; transition:all .8s ease 1.5s; }
+  #s4.active .s4-logo { opacity:1; }
+  .s4-logo-label { font-size:9px; letter-spacing:5px; color:var(--gold); margin-bottom:4px; }
+  .s4-logo-title { font-family:'Shippori Mincho',serif; font-size:clamp(20px,4vw,38px); color:var(--cream); letter-spacing:.1em; }
+  .s4-logo-date { font-size:11px; letter-spacing:3px; color:var(--accent); margin-top:4px; }
+
+  /* ── CONTROLS ── */
+  #progress { position:fixed; top:0; left:0; height:2px; background:var(--gold); width:0%; transition:width .4s ease; z-index:100; }
+  #dots { position:fixed; bottom:26px; left:50%; transform:translateX(-50%); display:flex; gap:10px; z-index:100; }
+  .dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.18); cursor:pointer; transition:all .3s ease; }
+  .dot.active { background:var(--gold); transform:scale(1.4); }
+  #replay { position:fixed; top:18px; right:18px; background:rgba(255,255,255,.06); border:1px solid rgba(201,169,110,.25); color:var(--gold); font-size:11px; letter-spacing:2px; padding:8px 18px; border-radius:20px; cursor:pointer; z-index:100; font-family:'Noto Sans JP',sans-serif; transition:all .2s; }
+  #replay:hover { background:rgba(201,169,110,.12); }
+  #next-btn { position:fixed; bottom:58px; right:26px; background:none; border:1px solid rgba(255,255,255,.14); color:rgba(255,255,255,.38); font-size:10px; letter-spacing:2px; padding:8px 16px; border-radius:20px; cursor:pointer; font-family:'Noto Sans JP',sans-serif; z-index:100; transition:all .2s; }
+  #next-btn:hover { color:white; border-color:rgba(255,255,255,.4); }
+</style>
+</head>
+<body>
+
+<!-- 星空 Canvas -->
+<canvas id="star-canvas"></canvas>
+
+<div id="progress"></div>
+
+<div id="stage">
+
+  <!-- SCENE 0: TITLE -->
+  <div class="scene active" id="s0">
+    <div class="s0-bg"></div>
+
+    <div class="s0-content">
+      <div class="s0-date">NOV 2026 — YOKOHAMA & TOKYO</div>
+      <div class="s0-title">横浜<em>・</em>東京<br>2泊3日</div>
+      <div class="s0-line"></div>
+      <div class="s0-sub">TRAVEL BOOKLET　旅のしおり</div>
+    </div>
+  </div>
+
+  <!-- SCENE 1: YOKOHAMA -->
+  <div class="scene" id="s1">
+    <div class="s1-copy">
+      <div class="s1-eyebrow">DAY 1 — YOKOHAMA</div>
+      <div class="s1-headline">横浜の港に、<br>さあ出かけよう。</div>
+    </div>
+
+    <div class="skyline">
+      <svg viewBox="0 0 720 268" xmlns="http://www.w3.org/2000/svg" width="100%">
+        <!-- ambient glow -->
+        <ellipse cx="360" cy="268" rx="340" ry="90" fill="rgba(201,169,110,.06)"/>
+
+        <!-- moon -->
+        <circle cx="78" cy="46" r="22" fill="rgba(232,213,163,.82)"/>
+        <circle cx="86" cy="40" r="18" fill="#050d1f"/>
+
+        <!-- left buildings -->
+        <rect x="30"  y="200" width="38" height="68" fill="#162040" rx="1"/>
+        <rect x="50"  y="182" width="20" height="86" fill="#1a2744" rx="1"/>
+        <rect x="72"  y="210" width="28" height="58" fill="#162040" rx="1"/>
+        <rect x="100" y="185" width="34" height="83" fill="#1a2744" rx="1"/>
+        <rect x="134" y="196" width="24" height="72" fill="#162040" rx="1"/>
+        <rect x="158" y="170" width="30" height="98" fill="#1a2744" rx="1"/>
+        <rect x="188" y="188" width="26" height="80" fill="#162040" rx="1"/>
+        <rect x="214" y="178" width="32" height="90" fill="#1a2744" rx="1"/>
+        <rect x="246" y="192" width="20" height="76" fill="#162040" rx="1"/>
+        <!-- left windows -->
+        <rect x="55"  y="190" width="4" height="3" fill="rgba(201,169,110,.45)" rx=".5"/>
+        <rect x="63"  y="190" width="4" height="3" fill="rgba(201,169,110,.2)"  rx=".5"/>
+        <rect x="55"  y="200" width="4" height="3" fill="rgba(201,169,110,.3)"  rx=".5"/>
+        <rect x="105" y="192" width="4" height="3" fill="rgba(201,169,110,.5)"  rx=".5"/>
+        <rect x="113" y="192" width="4" height="3" fill="rgba(201,169,110,.2)"  rx=".5"/>
+        <rect x="121" y="192" width="4" height="3" fill="rgba(201,169,110,.4)"  rx=".5"/>
+        <rect x="163" y="178" width="4" height="3" fill="rgba(201,169,110,.35)" rx=".5"/>
+        <rect x="171" y="178" width="4" height="3" fill="rgba(201,169,110,.5)"  rx=".5"/>
+        <rect x="163" y="188" width="4" height="3" fill="rgba(201,169,110,.2)"  rx=".5"/>
+        <rect x="219" y="185" width="4" height="3" fill="rgba(201,169,110,.4)"  rx=".5"/>
+        <rect x="227" y="185" width="4" height="3" fill="rgba(201,169,110,.3)"  rx=".5"/>
+        <rect x="235" y="185" width="4" height="3" fill="rgba(201,169,110,.2)"  rx=".5"/>
+
+        <!-- ランドマークタワー -->
+        <rect x="296" y="14"  width="28" height="254" fill="#1e3060" rx="2"/>
+        <rect x="302" y="6"   width="16" height="20"  fill="#1e3060"/>
+        <rect x="307" y="0"   width="6"  height="14"  fill="#c9a96e" rx="1"/>
+        <!-- tower windows -->
+        <rect x="299" y="24"  width="5" height="3" fill="rgba(201,169,110,.35)" rx=".5"/>
+        <rect x="307" y="24"  width="5" height="3" fill="rgba(201,169,110,.5)"  rx=".5"/>
+        <rect x="315" y="24"  width="5" height="3" fill="rgba(201,169,110,.25)" rx=".5"/>
+        <rect x="299" y="34"  width="5" height="3" fill="rgba(201,169,110,.5)"  rx=".5"/>
+        <rect x="307" y="34"  width="5" height="3" fill="rgba(201,169,110,.2)"  rx=".5"/>
+        <rect x="315" y="34"  width="5" height="3" fill="rgba(201,169,110,.4)"  rx=".5"/>
+        <rect x="299" y="44"  width="5" height="3" fill="rgba(201,169,110,.2)"  rx=".5"/>
+        <rect x="307" y="44"  width="5" height="3" fill="rgba(201,169,110,.45)" rx=".5"/>
+        <rect x="315" y="44"  width="5" height="3" fill="rgba(201,169,110,.3)"  rx=".5"/>
+        <rect x="299" y="54"  width="5" height="3" fill="rgba(201,169,110,.4)"  rx=".5"/>
+        <rect x="307" y="54"  width="5" height="3" fill="rgba(201,169,110,.2)"  rx=".5"/>
+        <rect x="315" y="54"  width="5" height="3" fill="rgba(201,169,110,.5)"  rx=".5"/>
+        <rect x="299" y="64"  width="5" height="3" fill="rgba(201,169,110,.3)"  rx=".5"/>
+        <rect x="307" y="64"  width="5" height="3" fill="rgba(201,169,110,.4)"  rx=".5"/>
+        <rect x="315" y="64"  width="5" height="3" fill="rgba(201,169,110,.2)"  rx=".5"/>
+        <rect x="299" y="74"  width="5" height="3" fill="rgba(201,169,110,.45)" rx=".5"/>
+        <rect x="307" y="74"  width="5" height="3" fill="rgba(201,169,110,.2)"  rx=".5"/>
+
+        <!-- 大観覧車 -->
+        <circle cx="435" cy="128" r="68" fill="none" stroke="rgba(122,156,191,.38)" stroke-width="3"/>
+        <circle cx="435" cy="128" r="4"  fill="#7a9cbf"/>
+        <line x1="435" y1="60"  x2="435" y2="128" stroke="rgba(122,156,191,.3)" stroke-width="1.5"/>
+        <line x1="435" y1="196" x2="435" y2="128" stroke="rgba(122,156,191,.3)" stroke-width="1.5"/>
+        <line x1="367" y1="128" x2="435" y2="128" stroke="rgba(122,156,191,.3)" stroke-width="1.5"/>
+        <line x1="503" y1="128" x2="435" y2="128" stroke="rgba(122,156,191,.3)" stroke-width="1.5"/>
+        <line x1="387" y1="80"  x2="435" y2="128" stroke="rgba(122,156,191,.18)" stroke-width="1"/>
+        <line x1="483" y1="80"  x2="435" y2="128" stroke="rgba(122,156,191,.18)" stroke-width="1"/>
+        <line x1="387" y1="176" x2="435" y2="128" stroke="rgba(122,156,191,.18)" stroke-width="1"/>
+        <line x1="483" y1="176" x2="435" y2="128" stroke="rgba(122,156,191,.18)" stroke-width="1"/>
+        <rect x="431" y="54"  width="8" height="5" fill="#c9a96e" rx="1" opacity=".7"/>
+        <rect x="431" y="191" width="8" height="5" fill="#c9a96e" rx="1" opacity=".7"/>
+        <rect x="362" y="125" width="8" height="5" fill="#c9a96e" rx="1" opacity=".7"/>
+        <rect x="498" y="125" width="8" height="5" fill="#c9a96e" rx="1" opacity=".7"/>
+        <line x1="435" y1="196" x2="435" y2="248" stroke="rgba(122,156,191,.28)" stroke-width="3"/>
+
+        <!-- right buildings -->
+        <rect x="510" y="178" width="30" height="90" fill="#1a2744" rx="1"/>
+        <rect x="540" y="195" width="25" height="73" fill="#162040" rx="1"/>
+        <rect x="565" y="185" width="32" height="83" fill="#1a2744" rx="1"/>
+        <rect x="597" y="202" width="28" height="66" fill="#162040" rx="1"/>
+        <rect x="625" y="190" width="22" height="78" fill="#1a2744" rx="1"/>
+        <rect x="647" y="208" width="30" height="60" fill="#162040" rx="1"/>
+        <rect x="677" y="195" width="30" height="73" fill="#1a2744" rx="1"/>
+        <!-- right windows -->
+        <rect x="515" y="185" width="4" height="3" fill="rgba(201,169,110,.4)"  rx=".5"/>
+        <rect x="523" y="185" width="4" height="3" fill="rgba(201,169,110,.2)"  rx=".5"/>
+        <rect x="515" y="195" width="4" height="3" fill="rgba(201,169,110,.5)"  rx=".5"/>
+        <rect x="570" y="192" width="4" height="3" fill="rgba(201,169,110,.3)"  rx=".5"/>
+        <rect x="578" y="192" width="4" height="3" fill="rgba(201,169,110,.5)"  rx=".5"/>
+        <rect x="630" y="197" width="4" height="3" fill="rgba(201,169,110,.35)" rx=".5"/>
+        <rect x="638" y="197" width="4" height="3" fill="rgba(201,169,110,.2)"  rx=".5"/>
+
+        <!-- 赤レンガ倉庫 -->
+        <rect x="58"  y="210" width="58" height="58" fill="#2a1a10" rx="2"/>
+        <rect x="63"  y="198" width="48" height="18" fill="#3a2415" rx="1"/>
+        <ellipse cx="77"  cy="222" rx="5" ry="7" fill="rgba(201,169,110,.22)"/>
+        <ellipse cx="92"  cy="222" rx="5" ry="7" fill="rgba(201,169,110,.12)"/>
+        <ellipse cx="107" cy="222" rx="5" ry="7" fill="rgba(201,169,110,.2)" />
+
+        <!-- ground -->
+        <rect x="0" y="248" width="720" height="20" fill="#0a1628"/>
+        <line x1="0" y1="250" x2="720" y2="250" stroke="rgba(122,156,191,.12)" stroke-width="1"/>
+
+        <!-- water reflections -->
+        <ellipse cx="310" cy="260" rx="8"  ry="2"   fill="rgba(201,169,110,.28)"/>
+        <ellipse cx="435" cy="262" rx="12" ry="2.5" fill="rgba(122,156,191,.22)"/>
+        <ellipse cx="190" cy="257" rx="5"  ry="1.5" fill="rgba(201,169,110,.18)"/>
+        <ellipse cx="560" cy="259" rx="6"  ry="1.5" fill="rgba(201,169,110,.15)"/>
+      </svg>
+    </div>
+
+    <div class="sea">
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="wave"></div>
+    </div>
+  </div>
+
+  <!-- SCENE 2: PHONES -->
+  <div class="scene" id="s2">
+    <div class="s2-copy">
+      <div class="s2-eyebrow">YOUR DIGITAL BOOKLET</div>
+      <div class="s2-headline">予定も、グルメも、乗換も。<br><em>ぜんぶ入ってる。</em></div>
+    </div>
+    <div class="phones-wrap">
+      <!-- Phone 1: DAY 1 -->
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="ph-header">
+            <div class="ph-header-label">TRAVEL BOOKLET</div>
+            <div class="ph-header-title">旅のしおり</div>
+            <div class="ph-header-sub">横浜・東京　2026.11.20</div>
+          </div>
+          <div class="ph-tabs">
+            <div class="ph-tab active">DAY 1</div>
+            <div class="ph-tab">DAY 2</div>
+            <div class="ph-tab">DAY 3</div>
+            <div class="ph-tab">🍴</div>
+            <div class="ph-tab">INFO</div>
+          </div>
+          <div class="ph-body ph-scroll">
+            <div class="ph-day-banner">
+              <div class="ph-day-num">01</div>
+              <div class="ph-day-info">
+                <div class="ph-day-date">NOV 20, 2026 — FRI</div>
+                <div class="ph-day-theme">横浜到着・みなとみらいへ</div>
+              </div>
+            </div>
+            <div class="ph-item">
+              <div class="ph-item-time">9:00</div>
+              <div class="ph-item-title">山形駅出発 🚄</div>
+              <div class="ph-item-desc">つばさ132号 東京行</div>
+            </div>
+            <div class="ph-item transit">
+              <div class="ph-item-time">11:48</div>
+              <div class="ph-item-title">東京駅→横浜へ</div>
+              <div class="ph-item-desc">JR東海道線 約28分</div>
+              <div class="ph-item-btns"><div class="ph-btn b">🚃 乗換ガイド</div></div>
+            </div>
+            <div class="ph-item">
+              <div class="ph-item-time">13:00</div>
+              <div class="ph-item-title">ランチ｜中華街 🥟</div>
+              <div class="ph-item-desc">食べ歩き＆点心ランチ</div>
+              <div class="ph-item-btns"><div class="ph-btn g">📍 地図</div><div class="ph-btn b">🗺 ルート</div></div>
+            </div>
+            <div class="ph-item hl">
+              <div class="ph-item-time">14:00</div>
+              <div class="ph-item-title">ホテルニューグランド 🏨</div>
+              <div class="ph-item-desc">チェックイン 14:00〜</div>
+              <div class="ph-item-btns"><div class="ph-btn g">🌐 公式</div><div class="ph-btn b">📍 地図</div></div>
+            </div>
+            <div class="ph-item">
+              <div class="ph-item-time">17:00</div>
+              <div class="ph-item-title">山下公園 夕暮れ散歩 🚢</div>
+              <div class="ph-item-desc">氷川丸・夕景を楽しむ</div>
+            </div>
+            <div class="ph-item">
+              <div class="ph-item-time">18:30</div>
+              <div class="ph-item-title">夕食｜中華街 🍜</div>
+              <div class="ph-item-desc">夜の中華街へ</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Phone 2: GOURMET -->
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="ph-header">
+            <div class="ph-header-label">TRAVEL BOOKLET</div>
+            <div class="ph-header-title">旅のしおり</div>
+            <div class="ph-header-sub">横浜・東京　2026.11.20</div>
+          </div>
+          <div class="ph-tabs">
+            <div class="ph-tab">DAY 1</div>
+            <div class="ph-tab">DAY 2</div>
+            <div class="ph-tab">DAY 3</div>
+            <div class="ph-tab active">🍴</div>
+            <div class="ph-tab">INFO</div>
+          </div>
+          <div class="ph-body ph-scroll" style="animation-delay:-2.5s;">
+            <div style="font-size:5px;letter-spacing:2px;color:#c9a96e;margin-bottom:6px;">🍽 食べたいリスト</div>
+            <div class="ph-item"><div class="ph-item-title">福臨閣</div><div class="ph-item-desc">中華街・広東料理</div></div>
+            <div class="ph-item hl"><div class="ph-item-title">萬珍樓 🌟</div><div class="ph-item-desc">老舗・広東料理</div></div>
+            <div class="ph-item"><div class="ph-item-title">皇朝（小籠包）</div><div class="ph-item-desc">食べ歩き</div></div>
+            <div style="height:5px;"></div>
+            <div style="font-size:5px;letter-spacing:2px;color:#c9a96e;margin-bottom:6px;">📍 エリア別おすすめ</div>
+            <div class="ph-item transit"><div class="ph-item-title">🥟 横浜中華街</div><div class="ph-item-desc">食べ歩き・着席ランチ</div></div>
+            <div class="ph-item transit"><div class="ph-item-title">☕ 元町・山手</div><div class="ph-item-desc">ニューグランドカフェ</div></div>
+            <div class="ph-item transit"><div class="ph-item-title">🗼 錦糸町・東京駅</div><div class="ph-item-desc">麺魚・グランスタ</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 3: FEATURES -->
+  <div class="scene" id="s3">
+    <div class="s3-wrap">
+      <div class="s3-eyebrow">FEATURES</div>
+      <div class="s3-headline">旅をもっと、<em>楽しく</em>する。</div>
+      <div class="features-grid">
+        <div class="feat"><div class="feat-icon">🗓</div><div class="feat-title">タイムライン管理</div><div class="feat-desc">3日分の予定を時系列で。「いまここ」をリアルタイム表示</div></div>
+        <div class="feat"><div class="feat-icon">🚃</div><div class="feat-title">ワンタップ乗換</div><div class="feat-desc">移動ごとのガイド付き。乗換案内・ルートをすぐ開ける</div></div>
+        <div class="feat"><div class="feat-icon">🍴</div><div class="feat-title">グルメリスト</div><div class="feat-desc">食べたいお店をメモ。エリア別おすすめも一覧で確認</div></div>
+        <div class="feat"><div class="feat-icon">🏨</div><div class="feat-title">ホテル情報</div><div class="feat-desc">チェックイン時刻・公式サイトをまとめてパッと確認</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 4: ENDING -->
+  <div class="scene" id="s4">
+    <div class="s4-bg"></div>
+    <div class="s4-content">
+      <div class="s4-tagline">さあ、<em>楽しい旅</em>へ。</div>
+      <div class="s4-sub">あなただけの旅のしおり</div>
+      <span class="s4-line"></span>
+      <div class="s4-logo">
+        <div class="s4-logo-label">TRAVEL BOOKLET</div>
+        <div class="s4-logo-title">旅のしおり</div>
+        <div class="s4-logo-date">横浜・東京　2026.11.20 — 11.22</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="dots">
+  <div class="dot active" onclick="goTo(0)"></div>
+  <div class="dot" onclick="goTo(1)"></div>
+  <div class="dot" onclick="goTo(2)"></div>
+  <div class="dot" onclick="goTo(3)"></div>
+  <div class="dot" onclick="goTo(4)"></div>
+</div>
+<button id="replay" onclick="restart()">↺ 最初から</button>
+<button id="prev-btn" onclick="prev()" style="display:none;position:fixed;bottom:58px;left:26px;background:none;border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.38);font-size:10px;letter-spacing:2px;padding:8px 16px;border-radius:20px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;z-index:100;transition:all .2s;">‹ 戻る</button>
+<button id="next-btn" onclick="next()">次へ ›</button>
+
+<script>
+// ═══════════════════════════════════════════════
+// STAR CANVAS — Canvas-based starfield with layers
+// ═══════════════════════════════════════════════
+(function(){
+  const canvas = document.getElementById('star-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [], nebulae = [];
+
+  function resize(){
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  // Star types: tiny/dim (bg), medium, bright, coloured
+  function initStars(){
+    stars = [];
+    // Layer 1: distant dim stars (many)
+    for(let i=0;i<280;i++){
+      stars.push({
+        x: Math.random()*W, y: Math.random()*H,
+        r: Math.random()*.7+.2,
+        base: Math.random()*.25+.05,
+        speed: Math.random()*1.5+.8,
+        phase: Math.random()*Math.PI*2,
+        color: '#ffffff',
+        layer:1
+      });
+    }
+    // Layer 2: medium stars
+    for(let i=0;i<120;i++){
+      const hue = Math.random()<.15 ? (Math.random()<.5 ? 210 : 30) : 0;
+      const sat = hue ? '60%' : '0%';
+      stars.push({
+        x: Math.random()*W, y: Math.random()*H,
+        r: Math.random()*1.2+.6,
+        base: Math.random()*.4+.15,
+        speed: Math.random()*2+.6,
+        phase: Math.random()*Math.PI*2,
+        color: hue ? `hsl(${hue},${sat},90%)` : '#ffffff',
+        layer:2
+      });
+    }
+    // Layer 3: bright stars with glow
+    for(let i=0;i<30;i++){
+      const hue = [0,210,45,180][Math.floor(Math.random()*4)];
+      stars.push({
+        x: Math.random()*W, y: Math.random()*H*.85,
+        r: Math.random()*1.8+1.0,
+        base: Math.random()*.5+.35,
+        speed: Math.random()*2.5+.5,
+        phase: Math.random()*Math.PI*2,
+        color: hue ? `hsl(${hue},70%,88%)` : '#fff',
+        glow: true,
+        layer:3
+      });
+    }
+    // Layer 4: "special" gold/blue accent stars
+    for(let i=0;i<10;i++){
+      stars.push({
+        x: Math.random()*W, y: Math.random()*H*.7,
+        r: Math.random()*2+1.5,
+        base: .6, speed: 1.2, phase: Math.random()*Math.PI*2,
+        color: Math.random()<.5 ? '#c9a96e' : '#7ac8ff',
+        glow: true, layer:4
+      });
+    }
+  }
+
+  // Soft nebula blobs
+  function initNebulae(){
+    nebulae = [
+      { x:W*.2,  y:H*.25, r:W*.18, c:'rgba(122,156,191,' },
+      { x:W*.75, y:H*.15, r:W*.14, c:'rgba(100,80,160,'  },
+      { x:W*.5,  y:H*.6,  r:W*.12, c:'rgba(80,120,160,'  },
+    ];
+  }
+
+  function drawNebulae(){
+    nebulae.forEach(n=>{
+      const g = ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.r);
+      g.addColorStop(0, n.c+'0.04)');
+      g.addColorStop(1, n.c+'0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+      ctx.fill();
+    });
+  }
+
+  let t = 0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    // deep space gradient
+    const bg = ctx.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0,  '#020810');
+    bg.addColorStop(.5, '#050d1f');
+    bg.addColorStop(1,  '#0a1628');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0,0,W,H);
+
+    drawNebulae();
+
+    t += .012;
+    stars.forEach(s=>{
+      const op = s.base + (s.base*.6) * Math.sin(t*s.speed + s.phase);
+
+      if(s.glow){
+        // outer glow
+        const gr = ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*5);
+        gr.addColorStop(0, s.color.replace(')',`,${op*.35})`).replace('rgb','rgba'));
+        gr.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = gr;
+        ctx.beginPath();
+        ctx.arc(s.x,s.y,s.r*5,0,Math.PI*2);
+        ctx.fill();
+      }
+
+      // star body
+      ctx.globalAlpha = op;
+      ctx.fillStyle = s.color;
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fill();
+
+      // cross sparkle for layer 3/4
+      if(s.layer>=3 && op>.5){
+        ctx.globalAlpha = op*.4;
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = .5;
+        ctx.beginPath();
+        ctx.moveTo(s.x-s.r*3,s.y); ctx.lineTo(s.x+s.r*3,s.y);
+        ctx.moveTo(s.x,s.y-s.r*3); ctx.lineTo(s.x,s.y+s.r*3);
+        ctx.stroke();
+      }
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize',()=>{ resize(); initNebulae(); });
+  resize();
+  initStars();
+  initNebulae();
+  draw();
+})();
+
+
+
+// ═══════════════════════════════════════════════
+// SCENE CONTROLLER
+// ═══════════════════════════════════════════════
+const SCENES    = ['s0','s1','s2','s3','s4'];
+const DURATIONS = [5000, 5500, 6500, 6500, 99999];
+let cur=0, timer=null, busy=false;
+
+function goTo(i, pauseAuto=true){
+  if(i<0 || i>=SCENES.length) return;
+  if(busy) return;
+  busy = true;
+  setTimeout(()=>busy=false, 700); // transition lock
+
+  SCENES.forEach((id,idx)=> document.getElementById(id).classList.toggle('active', idx===i));
+  document.querySelectorAll('.dot').forEach((d,idx)=> d.classList.toggle('active', idx===i));
+  cur = i;
+  document.getElementById('progress').style.width = ((i/(SCENES.length-1))*100)+'%';
+  clearTimeout(timer);
+  // 手動操作後は自動進行を止める（最終シーン以外は継続）
+  if(!pauseAuto && i < SCENES.length-1) timer = setTimeout(()=>next(false), DURATIONS[i]);
+  // 最終シーンなら次へボタン非表示
+  document.getElementById('next-btn').style.display = (i===SCENES.length-1) ? 'none' : 'block';
+  // 最初のシーンなら戻るボタン非表示
+  document.getElementById('prev-btn').style.display = (i===0) ? 'none' : 'block';
+}
+function next(pauseAuto=true){ if(cur<SCENES.length-1) goTo(cur+1, pauseAuto); }
+function prev(){ if(cur>0) goTo(cur-1, true); }
+function restart(){ goTo(0, false); }
+
+// ── マウスホイール ──
+let wheelCooldown = false;
+window.addEventListener('wheel', e=>{
+  if(wheelCooldown) return;
+  wheelCooldown = true;
+  setTimeout(()=>wheelCooldown=false, 800);
+  if(e.deltaY > 0) next(true);
+  else             prev();
+}, { passive:true });
+
+// ── タッチスワイプ ──
+let touchStartY=0, touchStartX=0;
+window.addEventListener('touchstart', e=>{
+  touchStartY = e.touches[0].clientY;
+  touchStartX = e.touches[0].clientX;
+}, { passive:true });
+window.addEventListener('touchend', e=>{
+  const dy = touchStartY - e.changedTouches[0].clientY;
+  const dx = touchStartX - e.changedTouches[0].clientX;
+  if(Math.abs(dy) < 40 && Math.abs(dx) < 40) return; // 小さすぎる動きは無視
+  if(Math.abs(dy) >= Math.abs(dx)){
+    // 縦スワイプ
+    if(dy > 40)  next(true);
+    else if(dy < -40) prev();
+  }
+}, { passive:true });
+
+// ── キーボード ──
+window.addEventListener('keydown', e=>{
+  if(e.key==='ArrowDown' || e.key==='ArrowRight' || e.key===' ') { e.preventDefault(); next(true); }
+  if(e.key==='ArrowUp'   || e.key==='ArrowLeft')                  { e.preventDefault(); prev(); }
+});
+
+goTo(0, false);
+</script>
+</body>
+</html>
